@@ -19,12 +19,16 @@ const client = await weaviate.connectToWeaviateCloud(
 
 const questions = client.collections.get('Question');
 
-const result = await questions.query.nearText('biology', {
-  limit: 2,
-});
+const result = await questions.generate.nearText(
+  'biology',
+  {
+    groupedTask: 'Write a tweet with emojis about these facts.',
+  },
+  {
+    limit: 2,
+  }
+);
 
-result.objects.forEach((item) => {
-  console.log(JSON.stringify(item.properties, null, 2));
-});
+console.log(result.generated);
 
 client.close();
