@@ -1,20 +1,22 @@
-import weaviate from 'weaviate-client';
+import weaviate, { vectorizer, generative } from 'weaviate-client';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Best practice: store your credentials in environment variables
 const wcdUrl = process.env.WEAVIATE_URL;
 const wcdApiKey = process.env.WEAVIATE_API_KEY;
 
 const client = await weaviate.connectToWeaviateCloud(
-  wcdUrl, // Replace with your Weaviate Cloud URL
+  wcdUrl,
   {
-    authCredentials: new weaviate.ApiKey(wcdApiKey), // Replace with your Weaviate Cloud API key
+    authCredentials: new weaviate.ApiKey(wcdApiKey),
   }
 );
 
-var clientReadiness = await client.isReady();
-console.log(clientReadiness); // Should return `true`
+await client.collections.create({
+  name: 'Question',
+  vectorizers: vectorizer.text2VecOpenAI(),
+  generative: generative.openAI(),
+});
 
-client.close(); // Close the client connection
+client.close();
