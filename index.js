@@ -17,22 +17,14 @@ const client = await weaviate.connectToWeaviateCloud(
   }
 );
 
-// データ取得関数
-async function getJsonData() {
-  const file = await fetch(
-    'https://raw.githubusercontent.com/weaviate-tutorials/quickstart/main/data/jeopardy_tiny.json'
-  );
-  return file.json();
-}
+const questions = client.collections.get('Question');
 
-// データインポート関数
-async function importQuestions() {
-  const questions = client.collections.get('Question');
-  const data = await getJsonData();
-  const result = await questions.data.insertMany(data);
-  console.log('Insertion response: ', result);
-}
+const result = await questions.query.nearText('biology', {
+  limit: 2,
+});
 
-await importQuestions();
+result.objects.forEach((item) => {
+  console.log(JSON.stringify(item.properties, null, 2));
+});
 
 client.close();
